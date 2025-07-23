@@ -35,8 +35,10 @@ export class WorkspaceInsertQueryBuilder<
   private internalContext: WorkspaceInternalContext;
   private authContext?: AuthContext;
   private relationNestedQueries: RelationNestedQueries;
-  private connectConfig: Record<string, RelationConnectQueryConfig>;
-  private disconnectConfig: RelationDisconnectQueryFieldsByEntityIndex;
+  private relationNestedConfig: [
+    RelationConnectQueryConfig[],
+    RelationDisconnectQueryFieldsByEntityIndex,
+  ];
 
   constructor(
     queryBuilder: InsertQueryBuilder<T>,
@@ -74,14 +76,11 @@ export class WorkspaceInsertQueryBuilder<
   ): this {
     const mainAliasTarget = this.getMainAliasTarget();
 
-    const { disconnectConfig, connectConfig } =
+    this.relationNestedConfig =
       this.relationNestedQueries.prepareNestedRelationQueries(
         values,
         mainAliasTarget,
       );
-
-    this.disconnectConfig = disconnectConfig;
-    this.connectConfig = connectConfig;
 
     const objectMetadata = getObjectMetadataFromEntityTarget(
       mainAliasTarget,
@@ -121,8 +120,7 @@ export class WorkspaceInsertQueryBuilder<
         entities: this.expressionMap.valuesSet as
           | QueryDeepPartialEntityWithNestedRelationFields<T>
           | QueryDeepPartialEntityWithNestedRelationFields<T>[],
-        relationDisconnectQueryFieldsByEntityIndex: this.disconnectConfig,
-        relationConnectQueryConfigs: this.connectConfig,
+        relationNestedConfig: this.relationNestedConfig,
         queryBuilder,
       });
 
