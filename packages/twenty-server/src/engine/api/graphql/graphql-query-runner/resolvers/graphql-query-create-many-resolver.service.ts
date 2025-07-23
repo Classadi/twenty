@@ -241,6 +241,7 @@ export class GraphqlQueryCreateManyResolverService extends GraphqlQueryBaseResol
 
         const existingRec = existingRecords.find(
           (existingRecord) =>
+            isDefined(existingRecord[field.column]) &&
             existingRecord[field.column] === requestFieldValue,
         );
 
